@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyTitle>SteamIntegration</AssemblyTitle>
+    <Product>Steam Achievement Unlocker</Product>
+    <AssemblyName>SteamIntegration</AssemblyName>
+    <Description></Description>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Read release version
+        id: version
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+          if ($tag -notmatch '^v(\d+\.\d+\.\d+)$') {
+            throw "Release tag must use the vMAJOR.MINOR.PATCH format, for example v0.0.1."
+          }
+          "version=$($Matches[1])" >> $env:GITHUB_OUTPUT
+
+      - name: Run tests
+        shell: pwsh
+        run: dotnet test tests/SteamAchievementUnlocker.Tests/SteamAchievementUnlocker.Tests.csproj --configuration Release -p:Platform=x86
+
+      - name: Publish single-file Windows build
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          dotnet publish SteamAchievementUnlocker/SteamAchievementUnlocker.csproj `
+            --configuration Release `
+            -p:PublishProfile=WindowsSingleFile `
+            -p:Version=$env:APP_VERSION `
+            -p:AssemblyVersion=$($env:APP_VERSION).0 `
+            -p:FileVersion=$($env:APP_VERSION).0
+
+      - name: Prepare release assets
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          REPOSITORY: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item 'publish/win-x86/Steam Achievement Unlocker.exe' 'dist/Steam-Achievement-Unlocker.exe' -Force
+          $sha256 = (Get-FileHash 'dist/Steam-Achievement-Unlocker.exe' -Algorithm SHA256).Hash.ToLowerInvariant()
+          $manifest = [ordered]@{
+            version = $env:APP_VERSION
+            downloadUrl = "https://github.com/$env:REPOSITORY/releases/download/$env:TAG/Steam-Achievement-Unlocker.exe"
+            releaseUrl = "https://github.com/$env:REPOSITORY/releases/tag/$env:TAG"
+            sha256 = $sha256
+            publishedAt = (Get-Date).ToUniversalTime().ToString('o')
+          }
+          $manifest | ConvertTo-Json | Set-Content -Path 'dist/latest.json' -Encoding utf8
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create '${{ github.ref_name }}' `
+            'dist/Steam-Achievement-Unlocker.exe' `
+            'dist/latest.json' `
+            --title 'Steam Achievement Unlocker ${{ steps.version.outputs.version }}' `
+            --generate-notes
