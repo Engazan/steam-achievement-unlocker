@@ -1,4 +1,18 @@
+<div align="center">
+
 # Steam Achievement Unlocker
+
+A Windows desktop application for viewing and managing Steam game achievements and statistics through the Steam client.
+
+[![Download](https://img.shields.io/github/v/release/Engazan/steam-achievement-unlocker?label=Download&style=for-the-badge&logo=github)](https://github.com/Engazan/steam-achievement-unlocker/releases)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#license)
+![Platforms](https://img.shields.io/badge/Platforms-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)
+
+### ⬇️ [**Download the latest release**](https://github.com/Engazan/steam-achievement-unlocker/releases/latest)
+
+<img src="docs/screenshots/game-library.png" alt="Steam Achievement Unlocker game library" width="900">
+
+</div>
 
 ## Why this project exists
 
@@ -6,8 +20,6 @@ The project was created for two legitimate use cases:
 
 - Migrating trophy and achievement progress from PlayStation Network or Xbox to Steam when moving to the Steam version of a game.
 - Repairing bugged or permanently unobtainable achievements that game developers no longer maintain or intend to patch.
-
-Steam Achievement Unlocker is a Windows desktop application for viewing and managing Steam game achievements and statistics through the Steam client.
 
 ## Features
 
@@ -73,8 +85,6 @@ The application communicates with the local Steam client and may also download p
 
 The desktop presentation layer is kept separate from the Steam integration and application services. Game discovery, artwork loading, achievement state reading, statistics handling and binary configuration parsing are implemented independently so the UI does not depend directly on native Steam details.
 
-The project is licensed under the MIT License. See [LICENSE](LICENSE).
-
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
